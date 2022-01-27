@@ -8,9 +8,25 @@ buttonField.addEventListener('click',function(){
 }) */
 
 //2nd way to get values from Form Data.
+//we have these basic requests or end points with server.
+/* 
+    @GET http://localhost:3000/todos
+    @POST http://localhost:3000/todos/1 {}
+    @PATCH http://localhost:3000/todos/1 {}
+    @PUT http://localhost:3000/todos/1 {}
+    @DELETE http://localhost:3000/todos/1 
+ */
+
+
 var todos = [];
 let isEdit = false;
 let editId = null;
+
+fetchTodos()
+    .then(data => {
+        todos = data;
+        render(todos);
+    })
 const todoForm = document.querySelector('#todo_form')
 const buttonField = document.querySelector('#btn');
 
@@ -39,24 +55,34 @@ buttonField.addEventListener('click', function () {
         createdAt:new Date().toString(),
         status:'active'
     } */}
-
-        todos=[...todos,todo]
+        createTodos(todo)
+            .then(data => {
+                todos = [...todos, todo];
+                render(todos)
+            })
 
     }
     else {
         //edit functionality
-        var newTodos=[...todos];
-        var idx=newTodos.findIndex(t=>t.id==editId)
-        var t={...newTodos[idx]}
-        t.title=formValues.title;
-        t.description=formValues.description;
-        newTodos[idx]=t;
-       releaseLock();
-       todos=newTodos
+        var newTodos = [...todos];
+        var idx = newTodos.findIndex(t => t.id == editId)
+        var t = { ...newTodos[idx] }
+        /*  trying with update function which i have written
+        t.title = formValues.title;
+        t.description = formValues.description;
+        newTodos[idx] = t; */
+        var id=idx+1;
+        updateTodo(id)
+            .then(data => {
+                releaseLock();
+                todos = newTodos;
+                console.log(todos)
+            })
+
     }
     title.value = null;
     description.value = null;
-    render(todos)
+
 })
 function editLock(id) {
     editId = id;
@@ -66,9 +92,9 @@ function editLock(id) {
 
 }
 function releaseLock() {
-    editId=null;
-    isEdit=false;
-    btn.textContent="Add Todo"
+    editId = null;
+    isEdit = false;
+    btn.textContent = "Add Todo"
 
 }
 /* we can write html code in js like this and this will be converted to html according to the given structure.
@@ -86,14 +112,13 @@ function getTodo(title, description) {
     //if the key and value are same then we can write like the below code.
     //js will keep the code like title:title;
     /* we have to extract the last element id and +1 to it and this will be our new Id */
-    var id;
+    /* fetch will take care of it ,so we commented this var id;
     if (todos.length == 0) id = 1;
     else {
         var last = todos[todos.length-1] //length()
         id = last.id + 1;
-    }
+    } */
     return {
-        id,
         title,
         description,
         status: "Active",
@@ -149,7 +174,7 @@ function renderTodoItem(todo) {
         var t = { ...newTodos[idx] };
         t.status = "Completed";
         newTodos[idx] = t;
-        todos=newTodos;
+        todos = newTodos;
         render(newTodos);
     })
 
@@ -188,8 +213,9 @@ function renderTodoItem(todo) {
         //Mutable way
 
         //Immutable way
-        var newTodos = todos.filter(t => t.id != todo.id);
-        todos=newTodos
+        //var newTodos = todos.filter(t => t.id != todo.id);
+        var newTodos = deleteTodo(todo.id);
+        todos = newTodos
         render(newTodos)
     })
 
@@ -208,4 +234,5 @@ function renderTodoItem(todo) {
     return mainRow;
 
 }
-render(todos);
+//if server this is not there than we are calling render here
+//render(todos);
