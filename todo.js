@@ -57,6 +57,7 @@ buttonField.addEventListener('click', function () {
     } */}
         createTodos(todo)
             .then(data => {
+                todo = { ...todo, id: data.id }
                 todos = [...todos, todo];
                 render(todos)
             })
@@ -67,17 +68,26 @@ buttonField.addEventListener('click', function () {
         var newTodos = [...todos];
         var idx = newTodos.findIndex(t => t.id == editId)
         var t = { ...newTodos[idx] }
-        /*  trying with update function which i have written
+        /*  trying with update function which i have written */
         t.title = formValues.title;
         t.description = formValues.description;
-        newTodos[idx] = t; */
-        var id=idx+1;
+        newTodos[idx] = t;
+
+
+        updateTodo(editId, t)
+            .then(_ => {
+                releaseLock();
+                todos = newTodos;
+                render(todos)
+            })
+
+        /* var id=idx+1;
         updateTodo(id)
             .then(data => {
                 releaseLock();
                 todos = newTodos;
                 console.log(todos)
-            })
+            }) */
 
     }
     title.value = null;
@@ -161,8 +171,6 @@ function renderTodoItem(todo) {
     statusBtn.textContent = 'mark Completed';
 
     statusBtn.addEventListener('click', () => {
-        //task 2,we have to findout the whos id is this,
-        //change the status into vice versa and call render function.
         {/* //mutable way
         var t=todos.find(t=> t.id== todo.id);
         t.status="Completed";
@@ -175,7 +183,10 @@ function renderTodoItem(todo) {
         t.status = "Completed";
         newTodos[idx] = t;
         todos = newTodos;
-        render(newTodos);
+        updateTodo(todo.id, t)
+            .then(_ => {
+                render(todos)
+            })
     })
 
     markCompleted.appendChild(statusBtn);
@@ -210,13 +221,13 @@ function renderTodoItem(todo) {
     statusBtn.className = 'btn btn-danger';
     statusBtn.textContent = 'Delete';
     statusBtn.addEventListener('click', () => {
-        //Mutable way
-
         //Immutable way
-        //var newTodos = todos.filter(t => t.id != todo.id);
-        var newTodos = deleteTodo(todo.id);
-        todos = newTodos
-        render(newTodos)
+        var newTodos = todos.filter(t => t.id != todo.id);
+        deleteTodo(todo.id)
+            .then(_ => {
+                todos = newTodos
+                render(newTodos)
+            })
     })
 
     statusAction.appendChild(statusBtn);

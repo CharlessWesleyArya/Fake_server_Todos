@@ -3,21 +3,20 @@
 function fetchTodos() {
     return fetch('http://localhost:3000/todos')
         .then((res) => res.json())
-        .then(data=>data)
+        .then(data => data)
         .catch((err) => {
             console.log(err);
         })
 }
 function createTodos(data) {
     return fetch('http://localhost:3000/todos', {
-        method:'POST',
+        method: 'POST',
         body: JSON.stringify(data),
         headers: {
             'Content-Type': 'application/json',
         },
     })
         .then((data) => data.json)
-        .then((data) => data)
         .catch((err) => console.log(err))
 }
 function deleteTodo(id) {
@@ -25,14 +24,38 @@ function deleteTodo(id) {
         method: 'DELETE'
     })
         .then((data) => data.json())
-        .then((data) => data)
         .catch((err) => console.log(err))
 }
-function updateTodo(id){
+/* this is done by me
+ function updateTodo(id){
     return fetch(`http://localhost:3000/todos/${id}`,{
         method:'PATCH'
     })
         .then((data)=>data.json)
         .then((data)=>data)
         .catch((err)=>console.log(err))
+} */
+
+function updateTodo(id, todo) {
+    return fetch(`http://localhost:3000/todos/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(todo),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(data => data.json())
+        .catch((err) => console.log(err))
 }
+
+
+
+
+
+
+
+
+
+
+
+
